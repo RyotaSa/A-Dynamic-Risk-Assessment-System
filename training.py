@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 import json
 
+
 ###################Load config.json and get path variables
 with open('config.json','r') as f:
     config = json.load(f) 
@@ -20,13 +21,21 @@ model_path = os.path.join(config['output_model_path'])
 def train_model():
     
     #use this logistic regression for training
-    LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+    model = LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
                     intercept_scaling=1, l1_ratio=None, max_iter=100,
-                    multi_class='warn', n_jobs=None, penalty='l2',
+                    multi_class='auto', n_jobs=None, penalty='l2',
                     random_state=0, solver='liblinear', tol=0.0001, verbose=0,
                     warm_start=False)
     
     #fit the logistic regression to your data
-    
+    df = pd.read_csv(dataset_csv_path + '/finaldata.csv')
+    y = df['exited']
+    df.drop(['corporation', 'exited'], inplace=True, axis=1)
+    model.fit(df, y)
     #write the trained model to your workspace in a file called trainedmodel.pkl
+    with open(model_path + '/trainedmodel.pkl', "wb") as f:
+        pickle.dump(model, f)
+
+if __name__ == '__main__':
+    train_model()
 
